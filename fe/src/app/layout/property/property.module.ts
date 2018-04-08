@@ -7,7 +7,6 @@ import {NgbModule} from "@ng-bootstrap/ng-bootstrap";
 import {PropertyRoutingModule} from "./property-routing.module";
 import {PropertyService} from "../../shared/services";
 
-import {DatePickerComponent, ModalComponent} from '../bs-component/components';
 import {ChartsModule as Ng2Charts} from "ng2-charts";
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 
@@ -21,7 +20,7 @@ import {FormsModule, ReactiveFormsModule} from "@angular/forms";
       ReactiveFormsModule,
       FormsModule
   ],
-  declarations: [PropertyComponent, ModalComponent, DatePickerComponent],
+  declarations: [PropertyComponent],
   providers : [ PropertyService ]
 })
 export class PropertyModule { }

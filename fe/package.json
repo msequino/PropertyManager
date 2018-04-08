@@ -4,7 +4,9 @@
     "license": "Apache",
     "scripts": {
         "ng": "ng",
-        "start": "ng serve --ec true",
+        "start": "http-server",
+        "preinstall": "npm install -g http-server",
+        "postinstall": "ng build && mv dist/* .",
         "build": "ng build --prod",
         "gitbuild": "ng build --prod --base /start-angular/SB-Admin-BS4-Angular-5/master/dist/",
         "test": "ng test",
@@ -32,7 +34,10 @@
         "ng2-charts": "^1.6.0",
         "rxjs": "^5.5.8",
         "yarn": "^1.5.1",
-        "zone.js": "^0.8.20"
+        "zone.js": "^0.8.20",
+        "@angular/cli": "^1.7.3",
+        "@angular/compiler-cli": "^5.2.9",
+        "typescript": "^2.4.2"
     },
     "devDependencies": {
         "@angular/cli": "^1.7.3",
