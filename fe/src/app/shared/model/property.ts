@@ -1,11 +1,11 @@
 import {LineChart} from "../../layout/property/property.component";
 
 export class Property {
-    _id:         string;
+    id:         string;
     city:       string;
     address:    string;
     postcode:   string;
-    coordinates:Coordinates;
+    coordinate: Coordinates;
     extra:      Extra[];
     strExtra:   string;
     prices:     Price[];
@@ -14,7 +14,7 @@ export class Property {
     constructor() {
         this.extra = [];
         this.prices = [];
-        this.coordinates = new Coordinates();
+        this.coordinate = new Coordinates();
     }
 }
 
@@ -33,8 +33,8 @@ export class Extra {
 }
 
 export class Price {
-    data:   Date;
-    value:  number;
+    date:   string;
+    price:  number;
 
     constructor() { }
 }

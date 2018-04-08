@@ -24,13 +24,17 @@ class PropertyServiceImpl extends PropertyService with DefaultMongoDB with Mongo
     // TODO manse put indexes
   }
 
-  override def getAll() : Future[List[Property]] = getAll[Property]().map{ x => x.map { y => println(y);y}}
+  override def getAll() : Future[List[Property]] = getAll[Property]()
+
   override def getById(id: String) : Future[Option[Property]] = getOptById[Property](BSONObjectID.parse(id).toOption.get)
+
   override def add(property: Property) : Future[Option[Property]] = {
     val pr = property.copy(_id = Some(BSONObjectID.generate))
     insert[Property](property).map( x => if( x.ok ) Some(pr) else None)
   }
-  override def edit(property: Property) : Future[Property] = findAndUpdate[Property](BSONDocument("_id" -> property._id), property)
-  override def delete(property: Property) : Future[Boolean] = deleteById[Property](property._id.get).map(_ > 0)
+
+  override def edit(id: String, property: Property) : Future[Property] = findAndUpdate[Property](BSONDocument("_id" -> BSONObjectID(id)), property.copy(_id = BSONObjectID.parse(id).toOption))
+
+  override def delete(id: String) : Future[Boolean] = deleteById[Property](BSONObjectID.parse(id).toOption.get).map(_ > 0)
 }
 

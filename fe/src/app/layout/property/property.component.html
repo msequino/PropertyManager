@@ -28,27 +28,31 @@
                     </thead>
                     <tbody>
                         <ng-template ngFor let-row [ngForOf]="properties">
-                            <tr (click)="row.chart.showable = !row.chart.showable">
+                            <tr (click)="row.chart && (row.chart.showable = !row.chart.showable)">
                                 <td >{{row.city}}</td>
                                 <td >{{row.postcode}}</td>
                                 <td >{{row.address}}</td>
                                 <td >
-                                    <a target="_blank" href='{{"https://www.google.com/maps/search/?api=1&query="+row.coordinates.lat + "," + row.coordinates.long}}'>
+                                    <a target="_blank" href='{{"https://www.google.com/maps/search/?api=1&query="+row.coordinate.lat + "," + row.coordinate.long}}'>
                                         <i class="glyphicon glyphicon-map-marker"></i> Location
                                     </a>
                                 </td>
                                 <td>
-                                    <a type="button" class="btn btn-outline-secondary" ngbPopover="{{row.strExtra}}" triggers="mouseenter:mouseleave" popoverTitle="Extras are:">
+
+                                    <a *ngIf="row.extra && row.extra.length > 0" type="button" class="btn btn-outline-secondary" ngbPopover="{{row.strExtra}}" triggers="mouseenter:mouseleave" popoverTitle="Extras are:">
                                         + {{row.extra.length}} Extra{{row.extra.length == 1 ? "" : "s"}}
                                     </a>
+                                    <span *ngIf="!row.extra || row.extra.length == 0">
+                                        No extra
+                                    </span>
                                 </td>
                                 <td>
                                     <button (click)="open(addPrice, row, $event)" class="btn btn-lg btn-success" type="button">Add price</button>
                                     <button (click)="open(newProp, row, $event)" class="btn btn-lg btn-success" type="button">Edit</button>
-                                    <button (click)="open(delete, null, $event)" class="btn btn-lg btn-danger" type="button">Delete</button>
+                                    <button (click)="open(delete, row, $event)" class="btn btn-lg btn-danger" type="button">Delete</button>
                                 </td>
                             </tr>
-                            <tr *ngIf="row.chart.showable">
+                            <tr *ngIf="row.chart && row.chart.showable">
                                 <td colspan="6">
                                     <canvas baseChart width="100%" [datasets]="row.chart.lineChartData" [labels]="row.chart.lineChartLabels" [options]="row.chart.lineChartOptions" [colors]="row.chart.lineChartColors" [legend]="row.chart.lineChartLegend" [chartType]="row.chart.lineChartType"></canvas>
                                 </td>
@@ -135,7 +139,7 @@
     </div>
     <div class="modal-footer">
         <button type="button" class="btn btn-success" (click)="saveProperty()">Save</button>
-        <button type="button" class="btn btn-outline-dark" (click)="c('Close click')">Close</button>
+        <button type="button" class="btn btn-dark" (click)="c('Close click')">Close</button>
     </div>
 </ng-template>
 
@@ -173,7 +177,7 @@
     </div>
     <div class="modal-footer">
         <button type="button" class="btn btn-success" (click)="submitPrice()">Add</button>
-        <button type="button" class="btn btn-outline-dark" (click)="c('Close click')">Close</button>
+        <button type="button" class="btn btn-dark" (click)="c('Close click')">Close</button>
     </div>
 </ng-template>
 
@@ -189,6 +193,6 @@
     </div>
     <div class="modal-footer">
         <button type="button" class="btn btn-danger" (click)="deleteProperty()">I'm sure</button>
-        <button type="button" class="btn btn-outline-dark" (click)="c('Close click')">Close</button>
+        <button type="button" class="btn btn-dark" (click)="c('Close click')">Close</button>
     </div>
 </ng-template>

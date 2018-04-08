@@ -5,7 +5,6 @@ import controllers.PropertyController
 import play.api.{Configuration, Environment}
 import play.api.mvc.{AbstractController, ControllerComponents, DefaultControllerComponents}
 import services._
-import services.price.{PriceService, PriceServiceImpl}
 import services.property.{PropertyService, PropertyServiceImpl}
 
 /**
@@ -24,7 +23,6 @@ class Module extends AbstractModule {
     // Use the system clock as the default implementation of Clock
     bind(classOf[ControllerComponents]).to(classOf[DefaultControllerComponents])
     bind(classOf[PropertyService]).to(classOf[PropertyServiceImpl])
-    bind(classOf[PriceService]).to(classOf[PriceServiceImpl])
   }
 
 }

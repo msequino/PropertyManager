@@ -21,12 +21,10 @@ export class PropertyComponent implements OnInit {
   public propertyForm: FormGroup;
   public priceForm: FormGroup;
 
-  public maxdate : Date;
-
+  public modalRef ;
 
   constructor(private propertyService: PropertyService, private modalService: NgbModal, private fb: FormBuilder) {
       this.properties = [];
-      this.maxdate = new Date();
 
       this.propertyForm = fb.group({
           id: [''],
@@ -61,21 +59,26 @@ export class PropertyComponent implements OnInit {
       (this.propertyForm.get("extra") as FormArray).removeAt(id);
   }
 
-  ngOnInit() {
+  loadPage() {
       this.propertyService.getProperties().subscribe( data => {
           this.properties = data.map(d => {
               let prop = d as Property;
-              prop.strExtra = prop.extra.map(d => (d.name + ": " + d.value)).join(",\n");
-              prop.chart = new LineChart(prop.prices.map(d => d.value), prop.prices.map(d => d.data))
+              prop.strExtra = (prop.extra ? prop.extra.map(d => (d.name + ": " + d.value)).join(",\n") : "");
+              prop.prices.sort((a,b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+              prop.chart = (prop.prices ? new LineChart(prop.prices.map(d => d.price), prop.prices.map(d => new Date(d.date))) : null);
               return prop;
           });
       });
+  }
 
+  ngOnInit() {
+
+      this.loadPage();
   }
 
   open(content, row, event) {
 
-      event.stopPropagation()
+      event.stopPropagation();
 
       this.propertyForm.reset();
 
@@ -84,20 +87,22 @@ export class PropertyComponent implements OnInit {
           (this.propertyForm.get("extra") as FormArray).removeAt(i);
 
       if(row != null) {
-          this.priceForm.get("id").setValue(row._id);
-          this.propertyForm.get("id").setValue(row._id);
+          this.priceForm.get("id").setValue(row.id);
+          this.propertyForm.get("id").setValue(row.id);
           this.propertyForm.get("city").setValue(row.city);
           this.propertyForm.get("address").setValue(row.address);
           this.propertyForm.get("postcode").setValue(row.postcode);
-          this.propertyForm.get("lat").setValue(row.coordinates.lat);
-          this.propertyForm.get("long").setValue(row.coordinates.long);
+          this.propertyForm.get("lat").setValue(row.coordinate.lat);
+          this.propertyForm.get("long").setValue(row.coordinate.long);
 
-          row.extra.forEach(d => {
-            this.addItem(d.name, d.value);
-          });
+          if(row.extra)
+              row.extra.forEach(d => {
+                this.addItem(d.name, d.value);
+              });
       }
 
-      this.modalService.open(content, {"size": "lg"}).result.then((result) => {
+      this.modalRef = this.modalService.open(content, {"size": "lg"})
+      this.modalRef.result.then((result) => {
           this.closeResult = `Closed with: ${result}`;
       }, (reason) => {
           this.closeResult = `Dismissed`;
@@ -105,14 +110,14 @@ export class PropertyComponent implements OnInit {
   }
 
   saveProperty() {
-      // TODO manse save property
+
       let p : Property = new Property();
-      p._id = this.propertyForm.get("id").value;
+      p.id = this.propertyForm.get("id").value;
       p.city = this.propertyForm.get("city").value;
       p.address = this.propertyForm.get("address").value;
       p.postcode = this.propertyForm.get("postcode").value;
-      p.coordinates.lat = this.propertyForm.get("lat").value;
-      p.coordinates.long = this.propertyForm.get("long").value;
+      p.coordinate.lat = this.propertyForm.get("lat").value;
+      p.coordinate.long = this.propertyForm.get("long").value;
 
       (this.propertyForm.get("extra") as FormArray).value.forEach( d => {
           let e = new Extra();
@@ -120,22 +125,59 @@ export class PropertyComponent implements OnInit {
           e.value = d.value;
           p.extra.push(e)
       })
-      console.log(p);
-      if(p._id == '' || typeof p._id == undefined)
-          this.propertyService.addProperty(p);
-      else
-          this.propertyService.editProperty(p);
+      if(p.id == '' || p.id == null) {
+          this.propertyService.addProperty(p).subscribe(res => {
+              this.properties = [];
+              this.loadPage();
+              this.modalRef.close();
+          });
+      } else
+          this.propertyService.editProperty(p).subscribe(res => {
+              this.properties = [];
+              this.loadPage();
+              this.modalRef.close();
+          });
   }
 
   deleteProperty() {
-      // TODO manse delete property
-      this.propertyService.removeProperty(this.propertyForm.get("id").value);
+      let p : Property = new Property();
+      p.id = this.propertyForm.get("id").value;
+      p.city = this.propertyForm.get("city").value;
+      p.address = this.propertyForm.get("address").value;
+      p.postcode = this.propertyForm.get("postcode").value;
+      p.coordinate.lat = this.propertyForm.get("lat").value;
+      p.coordinate.long = this.propertyForm.get("long").value;
+
+      (this.propertyForm.get("extra") as FormArray).value.forEach( d => {
+          let e = new Extra();
+          e.name = d.name;
+          e.value = d.value;
+          p.extra.push(e)
+      })
+
+      this.propertyService.removeProperty(p).subscribe(d => {
+
+          this.properties = [];
+          this.loadPage();
+          this.modalRef.close();
+
+      });
   }
 
   submitPrice() {
       console.log(this.priceForm)
-      // TODO manse delete property
-      this.propertyService.addPrice(this.propertyForm.get("id").value, new Price());
+      let price = new Price();
+      let tmp = this.priceForm.get("date").value;
+      price.date = tmp.year + "-" + tmp.month + "-" + tmp.day;
+      price.price = this.priceForm.get("price").value;
+
+      this.propertyService.addPrice(this.propertyForm.get("id").value, price).subscribe( res => {
+
+          this.priceForm.reset();
+          this.properties = [];
+          this.loadPage();
+          this.modalRef.close();
+      });
   }
 
 }
