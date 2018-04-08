@@ -1,0 +1,63 @@
+[
+  {
+    "_id" : "1",
+    "city": "Turin",
+    "address": "Via Roma, 10",
+    "postcode": "10141",
+    "coordinates": {
+      "lat" : 45.0723899,
+      "long" : 7.6400594
+    },
+    "extra" : [
+        {"name": "surface", "value": "150"},
+        {"name": "bedrooms", "value": "4"}
+    ],
+    "prices" : [
+      {"data": "01/02/2018", "value" : 150000},
+      {"data": "01/02/2017", "value" : 200000},
+      {"data": "01/12/2017", "value" : 210000},
+      {"data": "01/02/2016", "value" : 250000}
+    ]
+
+  },
+  {
+    "_id" : "2",
+    "city": "Turin",
+    "address": "Via Roma, 12",
+    "postcode": "10141",
+    "coordinates": {
+      "lat" : 45.0723899,
+      "long" : 7.7400594
+    },
+    "extra" : [
+        {"name": "surface", "value": "200"},
+        {"name": "bedrooms", "value": "6"}
+    ],
+    "prices" : [
+      {"data": "01/02/2018", "value" : 250000},
+      {"data": "01/12/2017", "value" : 350000},
+      {"data": "01/02/2016", "value" : 350000}
+    ]
+
+  },
+  {
+    "_id" : "3",
+    "city": "Turin",
+    "address": "Via Roma, 10",
+    "postcode": "10141",
+    "coordinates": {
+      "lat" : 45.0723899,
+      "long" : 7.6400594
+    },
+    "extra" : [
+        {"name": "surface", "value": "100"}
+    ],
+    "prices" : [
+      {"data": "01/02/2018", "value" : 150000},
+      {"data": "01/02/2017", "value" : 200000},
+      {"data": "01/12/2017", "value" : 210000},
+      {"data": "01/02/2016", "value" : 250000}
+    ]
+
+  }
+]
