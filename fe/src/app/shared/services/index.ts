@@ -4,7 +4,7 @@ import {Price, Property} from "../model/property";
 import { Observable } from "rxjs/Observable";
 import {HttpClient} from "@angular/common/http";
 import 'rxjs/Rx';
-import { environment} from "../../../environments/environment";
+import { environment} from "../../../environments/environment.prod";
 
 @Injectable()
 export class PropertyService {
