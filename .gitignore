@@ -13,5 +13,6 @@ dist
 /.project
 /RUNNING_PID
 /.settings
-*.class
+fe/node_modules
 *.log
+/logs

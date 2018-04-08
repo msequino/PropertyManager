@@ -1,0 +1,198 @@
+<div [@routerTransition]>
+
+    <div class="col-md-12">
+        <div class="card">
+            <div class="row" style="margin:20px">
+                <div class="col-md-8">
+                    <div class="header">
+                        <h4 class="title">Properties</h4>
+                        <p class="category">Check your property out. Clicking the row, you'll be able to see how the prices changed over the time</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <button (click)="open(newProp, null, $event)" class="btn btn-lg btn-success" type="button">
+                        <span class="glyphicon glyphicon-plus"></span>Add</button>
+                </div>
+            </div>
+            <div class="content table-responsive table-full-width">
+                <table class="table table-hover table-striped">
+                    <thead>
+                    <tr>
+                        <th>City</th>
+                        <th>Postcode</th>
+                        <th>Address</th>
+                        <th>Coordinates</th>
+                        <th>Extras</th>
+                        <th></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                        <ng-template ngFor let-row [ngForOf]="properties">
+                            <tr (click)="row.chart && (row.chart.showable = !row.chart.showable)">
+                                <td >{{row.city}}</td>
+                                <td >{{row.postcode}}</td>
+                                <td >{{row.address}}</td>
+                                <td >
+                                    <a target="_blank" href='{{"https://www.google.com/maps/search/?api=1&query="+row.coordinate.lat + "," + row.coordinate.long}}'>
+                                        <i class="glyphicon glyphicon-map-marker"></i> Location
+                                    </a>
+                                </td>
+                                <td>
+
+                                    <a *ngIf="row.extra && row.extra.length > 0" type="button" class="btn btn-outline-secondary" ngbPopover="{{row.strExtra}}" triggers="mouseenter:mouseleave" popoverTitle="Extras are:">
+                                        + {{row.extra.length}} Extra{{row.extra.length == 1 ? "" : "s"}}
+                                    </a>
+                                    <span *ngIf="!row.extra || row.extra.length == 0">
+                                        No extra
+                                    </span>
+                                </td>
+                                <td>
+                                    <button (click)="open(addPrice, row, $event)" class="btn btn-lg btn-success" type="button">Add price</button>
+                                    <button (click)="open(newProp, row, $event)" class="btn btn-lg btn-success" type="button">Edit</button>
+                                    <button (click)="open(delete, row, $event)" class="btn btn-lg btn-danger" type="button">Delete</button>
+                                </td>
+                            </tr>
+                            <tr *ngIf="row.chart && row.chart.showable">
+                                <td colspan="6">
+                                    <canvas baseChart width="100%" [datasets]="row.chart.lineChartData" [labels]="row.chart.lineChartLabels" [options]="row.chart.lineChartOptions" [colors]="row.chart.lineChartColors" [legend]="row.chart.lineChartLegend" [chartType]="row.chart.lineChartType"></canvas>
+                                </td>
+                            </tr>
+                        </ng-template>
+                    </tbody>
+                </table>
+
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<ng-template #newProp let-c="close" let-d="dismiss">
+    <div class="modal-header">
+        <h4 class="modal-title">Add new property</h4>
+        <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+        <form class="form-inline" [formGroup]="propertyForm">
+            <div class="row col-md-12">
+                <div class="col-md-5">
+                    <label>City</label>
+                </div>
+                <div class="col-md-7">
+                    <input class="form-control mr-sm-2" type="text" placeholder="City" formControlName="city" aria-label="Search">
+                </div>
+
+            </div>
+            <div class="row col-md-12">
+                <div class="col-md-5">
+                    <label>Address</label>
+                </div>
+                <div class="col-md-7">
+                    <input class="form-control mr-sm-2" type="text" placeholder="Address" formControlName="address"  aria-label="Search">
+                </div>
+            </div>
+            <div class="row col-md-12">
+                <div class="col-md-5">
+                    <label>Postcode</label>
+                </div>
+                <div class="col-md-7">
+                    <input class="form-control mr-sm-2" type="text" placeholder="Postcode" formControlName="postcode"  aria-label="Search">
+                </div>
+            </div>
+            <div class="row col-md-12">
+                <div class="col-md-5">
+                    <label>Latitude</label>
+                </div>
+                <div class="col-md-7">
+                    <input class="form-control mr-sm-2" type="number" step="0.1" placeholder="Latitude" formControlName="lat" aria-label="Search">
+                </div>
+            </div>
+            <div class="row col-md-12">
+                <div class="col-md-5">
+                    <label>Longitude</label>
+                </div>
+                <div class="col-md-7">
+                    <input class="form-control mr-sm-2" type="number" step="0.1" placeholder="Longitude" formControlName="long" aria-label="Search">
+                </div>
+            </div>
+
+            <div class="row col-md-12">
+                <div class="col-md-12">
+                    <label>Extra</label>
+                </div>
+                <div class="row extras col-md-12" formArrayName="extra"
+                     *ngFor="let item of propertyForm.get('extra').controls; let i = index;">
+                    <div class="row" [formGroupName]="i">
+                        <input formControlName="name" class="form-control mr-sm-2" placeholder="Item name">
+                        <input formControlName="value" class="form-control mr-sm-2" placeholder="Item price">
+                        <button class="btn btn-danger" (click)="deleteItem(i)">Del</button>
+                    </div>
+                </div>
+                <div class="row extras">
+                    <button class="btn btn-success" (click)="addItem('', '')">Add</button>
+                </div>
+            </div>
+
+        </form>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-success" (click)="saveProperty()">Save</button>
+        <button type="button" class="btn btn-dark" (click)="c('Close click')">Close</button>
+    </div>
+</ng-template>
+
+<ng-template #addPrice let-c="close" let-d="dismiss">
+    <div class="modal-header">
+        <h4 class="modal-title">Add price to property</h4>
+        <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+        <form class="form-inline" [formGroup]="priceForm">
+            <div class="row col-md-12">
+                <div class="col-md-5">
+                    <label>Date</label>
+                </div>
+                <div class="col-md-7">
+                    <input class="form-control" placeholder="yyyy-mm-dd"
+                           formControlName="date" name="dp" [maxDate]="maxdate" ngbDatepicker #d="ngbDatepicker">
+                    <button class="input-group-addon" (click)="d.toggle()" type="button">
+                        <span class="fa fa-calendar"></span>
+                    </button>
+                </div>
+            </div>
+            <div class="row col-md-12">
+                <div class="col-md-5">
+                    <label>Price</label>
+                </div>
+                <div class="col-md-7">
+                    <input class="form-control mr-sm-2" type="number" step="10" min="0" placeholder="Price" formControlName="price" aria-label="Price">
+                </div>
+            </div>
+        </form>
+
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-success" (click)="submitPrice()">Add</button>
+        <button type="button" class="btn btn-dark" (click)="c('Close click')">Close</button>
+    </div>
+</ng-template>
+
+<ng-template #delete let-c="close" let-d="dismiss">
+    <div class="modal-header">
+        <h4 class="modal-title">Are you sure to delete property?</h4>
+        <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+        <p>If you continue, you will delete the property from the database</p>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-danger" (click)="deleteProperty()">I'm sure</button>
+        <button type="button" class="btn btn-dark" (click)="c('Close click')">Close</button>
+    </div>
+</ng-template>
