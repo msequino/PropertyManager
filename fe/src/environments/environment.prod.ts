@@ -1,6 +1,6 @@
 export const environment = {
   production: true,
-    proto: "http",
-    host: "localhost",
-    port: "9000",
+    proto: "https",
+    host: "obscure-fortress-49156.herokuapp.com",
+    port: "443",
 };
