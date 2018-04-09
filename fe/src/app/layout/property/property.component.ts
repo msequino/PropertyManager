@@ -33,7 +33,8 @@ export class PropertyComponent implements OnInit {
           postcode: ['', Validators.required],
           lat: ['', Validators.required],
           long: ['', Validators.required],
-          extra: fb.array([])
+          extra: fb.array([]),
+          prices: fb.array([])
       });
 
       this.priceForm = fb.group({
@@ -51,12 +52,23 @@ export class PropertyComponent implements OnInit {
     });
   }
 
+  createPrice(name, value): FormGroup {
+      return this.fb.group({
+        date: [name, Validators.required],
+        price: [value, Validators.required]
+    });
+  }
+
+  addPrice(name, value): void {
+    (this.propertyForm.get("prices") as FormArray).push(this.createPrice(name, value));
+  }
+
   addItem(name, value): void {
-      (this.propertyForm.get("extra") as FormArray).push(this.createItem(name, value));
+    (this.propertyForm.get("extra") as FormArray).push(this.createItem(name, value));
   }
 
   deleteItem(id: number): void {
-      (this.propertyForm.get("extra") as FormArray).removeAt(id);
+    (this.propertyForm.get("extra") as FormArray).removeAt(id);
   }
 
   loadPage() {
@@ -99,6 +111,11 @@ export class PropertyComponent implements OnInit {
               row.extra.forEach(d => {
                 this.addItem(d.name, d.value);
               });
+          if(row.prices)
+              row.prices.forEach(d => {
+                  this.addPrice(d.date, d.price);
+              });
+
       }
 
       this.modalRef = this.modalService.open(content, {"size": "lg"})
@@ -119,12 +136,20 @@ export class PropertyComponent implements OnInit {
       p.coordinate.lat = this.propertyForm.get("lat").value;
       p.coordinate.long = this.propertyForm.get("long").value;
 
+      (this.propertyForm.get("prices") as FormArray).value.forEach( d => {
+          let e = new Price();
+          e.date = d.date;
+          e.price = d.price;
+          p.prices.push(e)
+      });
+
       (this.propertyForm.get("extra") as FormArray).value.forEach( d => {
           let e = new Extra();
           e.name = d.name;
           e.value = d.value;
           p.extra.push(e)
-      })
+      });
+
       if(p.id == '' || p.id == null) {
           this.propertyService.addProperty(p).subscribe(res => {
               this.properties = [];
