@@ -68,7 +68,7 @@ export class PropertyComponent implements OnInit {
   }
 
   deleteItem(id: number): void {
-      (this.propertyForm.get("extra") as FormArray).removeAt(id);
+    (this.propertyForm.get("extra") as FormArray).removeAt(id);
   }
 
   loadPage() {
@@ -136,19 +136,19 @@ export class PropertyComponent implements OnInit {
       p.coordinate.lat = this.propertyForm.get("lat").value;
       p.coordinate.long = this.propertyForm.get("long").value;
 
-      (this.propertyForm.get("extra") as FormArray).value.forEach( d => {
-          let e = new Extra();
-          e.name = d.name;
-          e.value = d.value;
-          p.extra.push(e)
-      })
-
       (this.propertyForm.get("prices") as FormArray).value.forEach( d => {
           let e = new Price();
           e.date = d.date;
           e.price = d.price;
           p.prices.push(e)
-      })
+      });
+
+      (this.propertyForm.get("extra") as FormArray).value.forEach( d => {
+          let e = new Extra();
+          e.name = d.name;
+          e.value = d.value;
+          p.extra.push(e)
+      });
 
       if(p.id == '' || p.id == null) {
           this.propertyService.addProperty(p).subscribe(res => {
