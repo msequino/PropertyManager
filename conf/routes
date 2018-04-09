@@ -8,7 +8,7 @@ GET     /                           controllers.HomeController.index
 
 GET     /api/v1/property            controllers.PropertyController.get
 POST    /api/v1/property            controllers.PropertyController.add
-PUT     /api/v1/property            controllers.PropertyController.edit
+PUT     /api/v1/property            controllers.PropertyController.edit(id)
 POST    /api/v1/property/delete     controllers.PropertyController.delete
 
 POST    /api/v1/price/property      controllers.PriceController.addToProperty(id)
