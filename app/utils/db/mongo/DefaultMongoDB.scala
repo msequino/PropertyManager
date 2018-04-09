@@ -1,5 +1,6 @@
 package utils.db.mongo
-import reactivemongo.api.{DefaultDB, MongoDriver}
+import reactivemongo.api.{DefaultDB, MongoConnectionOptions, MongoDriver}
+import reactivemongo.core.nodeset.Authenticate
 
 import scala.concurrent.Await
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -12,5 +13,6 @@ trait DefaultMongoDB extends MongoDB {
 
 object DefaultMongoDB extends DefaultMongoDBConnection {
   lazy val driver: MongoDriver = new MongoDriver
-  lazy val db: DefaultDB = Await.result(driver.connection(Seq(s"$host:$port")).database(name), 30.seconds)
+  lazy val credentials = Seq(Authenticate(name, user, ""))
+  lazy val db: DefaultDB = Await.result(driver.connection(Seq(s"$host:$port"), authentications = credentials).database(name), 30.seconds)
 }

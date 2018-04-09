@@ -16,4 +16,5 @@ dist
 fe/node_modules
 *.log
 /logs
-/fe
+fe/
+target/
