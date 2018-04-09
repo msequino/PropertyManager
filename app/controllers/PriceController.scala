@@ -14,6 +14,8 @@ import utils.FutureUtils
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
 import services.property._
+import play.api.Logger
+
 @Singleton
 class PriceController @Inject()(cc: ControllerComponents,
                                 propertyService: PropertyService)(implicit exec: ExecutionContext) extends AbstractController(cc) {
@@ -22,7 +24,7 @@ class PriceController @Inject()(cc: ControllerComponents,
 
   def addToProperty(id: String) = Action.async(parse.json) { request =>
 
-    println(id, request.body)
+    Logger.info(s"addToProperty - propertyId[$id], request[${request}]")
     (for {
       newPrice <- Future.fromTry(Try(request.body.validate[PriceDTO].asOpt))
       if FutureUtils.notSatisfy(newPrice.isDefined) { new Exception("data not valid") }
@@ -32,7 +34,10 @@ class PriceController @Inject()(cc: ControllerComponents,
     } yield {
       Ok(Json.toJson(res))
     }) recover {
-      case ex: Exception => BadRequest(s"Cannot add the properties ${ex}")
+      case ex: Exception => {
+        Logger.error(s"addToProperty exception - $ex")
+        BadRequest(s"Cannot add the properties ${ex}")
+      }
     }
   }
 }

@@ -6,29 +6,34 @@ import play.api.libs.json.Json
 import play.api.mvc.{AbstractController, ControllerComponents}
 import services.property.PropertyService
 import utils.FutureUtils
-
 import services.property.PropertyDefs._
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
-
 import models.Formats._
+import play.api.Logger
 
 @Singleton
 class PropertyController @Inject()(cc: ControllerComponents, propertyService: PropertyService)(implicit ec: ExecutionContext) extends AbstractController(cc) {
 
   def get() = Action.async { request =>
 
+    Logger.info(s"get - request[${request}]")
     (for {
       properties <- propertyService.getAll()
     } yield {
       Ok(Json.toJson(properties.map(x => PropertyRes(Some(x.id), x.city, x.address, x.postcode, x.coordinates, x.extra.getOrElse(Nil), x.prices.getOrElse(Nil)))))
     }) recover {
-      case ex: Exception => BadRequest("Cannot recover the properties")
+      case ex: Exception => {
+        Logger.error(s"get exception [$ex]")
+        BadRequest("Cannot recover the properties")
+      }
     }
   }
 
   def add() = Action.async(parse.json) { request =>
+
+    Logger.info(s"add - request[${request}]")
 
     (for {
       prop <- Future.fromTry(Try(request.body.validate[PropertyRes].asOpt))
@@ -38,24 +43,34 @@ class PropertyController @Inject()(cc: ControllerComponents, propertyService: Pr
     } yield {
       Ok(Json.toJson(res.map(x => PropertyRes(Some(x.id), x.city, x.address, x.postcode, x.coordinates, x.extra.getOrElse(Nil), x.prices.getOrElse(Nil)))))
     }) recover {
-      case ex: Exception => BadRequest(s"Cannot add the properties ${ex}")
+      case ex: Exception => {
+        Logger.error(s"add exception [$ex]")
+        BadRequest(s"Cannot add the properties ${ex}")
+      }
     }
   }
 
-  def edit() = Action.async(parse.json) { request =>
+  def edit(id: String) = Action.async(parse.json) { request =>
+
+    Logger.info(s"edit - request[${request}]")
 
     (for {
       prop <- Future.fromTry(Try(request.body.validate[PropertyRes].asOpt))
       if FutureUtils.notSatisfy(prop.isDefined) { new Exception("data not valid") }
-      res <- propertyService.edit(prop.get.id.get, prop.map(x => Property(city = x.city, address = x.address, postcode = x.postcode, coordinates = x.coordinate, extra = Some(x.extra), prices = Some(x.prices))).get)
+      res <- propertyService.edit(id, prop.map(x => Property(city = x.city, address = x.address, postcode = x.postcode, coordinates = x.coordinate, extra = Some(x.extra), prices = Some(x.prices))).get)
     } yield {
       Ok(Json.toJson(res))
     }) recover {
-      case ex: Exception => BadRequest(s"Cannot edit the property ${request.body} ${ex}")
+      case ex: Exception => {
+        Logger.error(s"edit exception [$ex]")
+        BadRequest(s"Cannot edit the property ${request.body} ${ex}")
+      }
     }
   }
 
   def delete() = Action.async(parse.json) { request =>
+
+    Logger.info(s"delete - request[${request}]")
 
     (for {
       prop <- Future.fromTry(Try(request.body.validate[PropertyId].asOpt))
@@ -64,7 +79,11 @@ class PropertyController @Inject()(cc: ControllerComponents, propertyService: Pr
     } yield {
       Ok(Json.toJson(res))
     }) recover {
-      case ex: Exception => BadRequest(s"Cannot delete the property ${request.body}")
+      case ex: Exception => {
+        Logger.error(s"delete exception [$ex]")
+
+        BadRequest(s"Cannot delete the property ${request.body}")
+      }
     }
   }
 }
