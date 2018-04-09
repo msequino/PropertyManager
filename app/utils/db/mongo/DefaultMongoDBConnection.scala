@@ -3,6 +3,7 @@ package utils.db.mongo
 import com.typesafe.config.ConfigFactory
 
 class DefaultMongoDBConnection extends MongoDBConnection {
+  override def pass: String = Option(ConfigFactory.load.getString("mongodb.pass")) getOrElse { throw new IllegalArgumentException("missing configuration 'mongodb.pass'") }
   override def user: String = Option(ConfigFactory.load.getString("mongodb.user")) getOrElse { throw new IllegalArgumentException("missing configuration 'mongodb.user'") }
   override def name: String = Option(ConfigFactory.load.getString("mongodb.name")) getOrElse { throw new IllegalArgumentException("missing configuration 'mongodb.name'") }
   override def host: String = Option(ConfigFactory.load.getString("mongodb.host")) getOrElse { throw new IllegalArgumentException("missing configuration 'mongodb.name'") }

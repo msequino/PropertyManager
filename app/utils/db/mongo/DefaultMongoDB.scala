@@ -13,6 +13,6 @@ trait DefaultMongoDB extends MongoDB {
 
 object DefaultMongoDB extends DefaultMongoDBConnection {
   lazy val driver: MongoDriver = new MongoDriver
-  lazy val credentials = Seq(Authenticate(name, user, ""))
+  lazy val credentials = Seq(Authenticate(name, user, pass))
   lazy val db: DefaultDB = Await.result(driver.connection(Seq(s"$host:$port"), authentications = credentials).database(name), 30.seconds)
 }
