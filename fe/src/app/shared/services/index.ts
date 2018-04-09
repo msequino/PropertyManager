@@ -24,7 +24,7 @@ export class PropertyService {
 
     editProperty(data: Property) : Observable<Property> {
         return this.http
-            .put(this.host + "/api/v1/property", data).map(res => res as Property)
+            .put(this.host + "/api/v1/property?id=" + data.id, data).map(res => res as Property)
     }
 
     removeProperty(data: Property) : Observable<Boolean> {
